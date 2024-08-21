@@ -18,7 +18,7 @@ export default function Register(){
             email: emailRef.current.value,
             password: passwordRef.current.value
         }
-        console.log(payload);
+        //console.log(payload);
         axiosClient.post('register', payload).then(({data}) => {
             setUser(data.user);
             setToken(data.token);
@@ -40,7 +40,7 @@ export default function Register(){
                     <input ref={nameRef} type="name" placeholder="name"/>
                     <input ref={emailRef} type="email" placeholder="email"/>
                     <input ref={passwordRef} type="password" placeholder="password"/>
-                    <button className="btn btn-block">Login</button>
+                    <button className="btn btn-block">Register</button>
                     <p className="message">
                         Already Have An Account? <Link to='/login'>Login</Link>
                     </p>
