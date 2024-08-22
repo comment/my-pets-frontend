@@ -1,15 +1,31 @@
+import { useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { useStateContext } from "../contexts/contextprovider.jsx";
+import axiosClient from "../axiosClient";
+import { useStateContext } from "../contexts/contextprovider";
 
 export default function DefaultLayout(){
-    const {user, token} = useStateContext();
+    const {user, token, setUser, setToken} = useStateContext();
     if(!token){
-        return <Navigate to='/login' />
+        return <Navigate to='/login'/>
     }
 
-    const onLogout = (ev) => {
+    const onLogout =  (ev) =>{
         ev.preventDefault();
+        axiosClient.get('/logout')
+            .then(({}) => {
+                setUser(null)
+                setToken(null)
+            })
     }
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+        axiosClient.get('/user')
+            .then(({data}) => {
+                //console.log(data);
+                setUser(data)
+            })
+    }, [])
 
     return(
         <div id="defaultLayout">
