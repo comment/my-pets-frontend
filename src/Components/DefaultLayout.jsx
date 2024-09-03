@@ -11,7 +11,7 @@ export default function DefaultLayout(){
 
     const onLogout =  (ev) =>{
         ev.preventDefault();
-        axiosClient.get('/logout')
+        axiosClient.get('/sanctum/logout')
             .then(({}) => {
                 setUser(null)
                 setToken(null)
@@ -20,7 +20,7 @@ export default function DefaultLayout(){
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
-        axiosClient.get('/user')
+        axiosClient.get('/sanctum/user')
             .then(({data}) => {
                 //console.log(data);
                 setUser(data)

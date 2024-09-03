@@ -19,7 +19,7 @@ export default function Register(){
             password: passwordRef.current.value
         }
         //console.log(payload);
-        axiosClient.post('register', payload).then(({data}) => {
+        axiosClient.post('sanctum/register', payload).then(({data}) => {
             setUser(data.user);
             setToken(data.token);
         }).catch(err => {
