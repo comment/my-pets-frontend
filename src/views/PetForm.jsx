@@ -11,10 +11,11 @@ export default function PetForm() {
         nickname: '',
         date_of_birth: '',
         about: '',
-        user_id: '9cff8bb7-eb84-424f-bb9e-a937ca85164c',
-        type_id: '9cff8bb8-2e5a-4265-bfe2-35c638ef7b18',
-        sub_type_id: '9cff8bb8-d4d8-47ab-a3bd-8ceb28dcc91b',
+        user_id: '9d007644-821d-4260-92d6-b06af4c04e2b',
+        type_id: '9d007644-8559-42c0-865b-66afcfc189ef',
+        sub_type_id: '9d007644-9486-49b7-8520-5668f701ae62',
     });
+
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState(null);
 
