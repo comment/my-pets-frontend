@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Link, Navigate, Outlet } from "react-router-dom";
 import axiosClient from "../axiosClient";
 import { useStateContext } from "../contexts/contextprovider";
 
@@ -33,6 +33,15 @@ export default function DefaultLayout(){
                 <header>
                     <div>
                         Header
+                    </div>
+                    <div>
+                        <Link to='/users'>Users</Link>
+                    </div>
+                    <div>
+                        <Link to='/pets'>Pets</Link>
+                    </div>
+                    <div>
+                        <Link to='/roles'>Roles</Link>
                     </div>
                     <div>
                         {user.name}

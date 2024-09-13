@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosClient from "../axiosClient";
 
-export default function UserForm() {
+export default function RoleForm() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [user, setUser] = useState({
+    const [role, setRole] = useState({
         id: null,
         name: '',
-        email: '',
-        password: ''
+        slug: '',
     });
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState(null);
@@ -17,10 +16,10 @@ export default function UserForm() {
     if (id) {
         useEffect(() => {
             setLoading(true)
-            axiosClient.get(`/users/${id}`)
+            axiosClient.get(`/roles/${id}`)
                 .then(({ data }) => {
                     setLoading(false)
-                    setUser(data.data)
+                    setRole(data.data)
                 })
                 .catch(() => {
                     setLoading(false)
@@ -30,10 +29,10 @@ export default function UserForm() {
 
     const onSubmit = ev => {
         ev.preventDefault()
-        if (user.id) {
-            axiosClient.put(`/users/${user.id}`, user)
+        if (role.id) {
+            axiosClient.put(`/roles/${role.id}`, role)
                 .then(() => {
-                    navigate('/users')
+                    navigate('/roles')
                 })
                 .catch(err => {
                     const response = err.response;
@@ -42,9 +41,9 @@ export default function UserForm() {
                     }
                 })
         } else {
-            axiosClient.post('/users', user)
+            axiosClient.post('/roles', role)
                 .then(() => {
-                    navigate('/users')
+                    navigate('/roles')
                 })
                 .catch(err => {
                     const response = err.response;
@@ -57,8 +56,8 @@ export default function UserForm() {
 
     return (
         <>
-            {user.id && <h1>Update User: {user.name}</h1>}
-            {!user.id && <h1>New User</h1>}
+            {role.id && <h1>Update Role: {role.name}</h1>}
+            {!role.id && <h1>New Role</h1>}
             <div className="card animated fadeInDown">
                 {loading && (
                     <div className="text-center">
@@ -74,12 +73,10 @@ export default function UserForm() {
                 }
                 {!loading && (
                     <form onSubmit={onSubmit}>
-                        <input value={user.name} onChange={ev => setUser({ ...user, name: ev.target.value })}
+                        <input value={role.name} onChange={ev => setRole({ ...role, name: ev.target.value })}
                                placeholder="Name"/>
-                        <input value={user.email} onChange={ev => setUser({ ...user, email: ev.target.value })}
-                               placeholder="Email"/>
-                        <input type="password" onChange={ev => setUser({ ...user, password: ev.target.value })}
-                               placeholder="Password"/>
+                        <input value={role.slug} onChange={ev => setRole({ ...role, slug: ev.target.value })}
+                               placeholder="Slug"/>
                         <button className="btn">Save</button>
                     </form>
                 )}

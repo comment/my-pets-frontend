@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosClient from "../axiosClient";
 
-export default function UserForm() {
+export default function PetForm() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [user, setUser] = useState({
+    const [pet, setPet] = useState({
         id: null,
-        name: '',
-        email: '',
-        password: ''
+        identifier: '',
+        nickname: '',
+        date_of_birth: '',
+        about: '',
+        user_id: '9cff8bb7-eb84-424f-bb9e-a937ca85164c',
+        type_id: '9cff8bb8-2e5a-4265-bfe2-35c638ef7b18',
+        sub_type_id: '9cff8bb8-d4d8-47ab-a3bd-8ceb28dcc91b',
     });
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState(null);
@@ -17,10 +21,10 @@ export default function UserForm() {
     if (id) {
         useEffect(() => {
             setLoading(true)
-            axiosClient.get(`/users/${id}`)
+            axiosClient.get(`http://127.0.0.1:80/api/v1/pets/${id}`)
                 .then(({ data }) => {
                     setLoading(false)
-                    setUser(data.data)
+                    setPet(data.data)
                 })
                 .catch(() => {
                     setLoading(false)
@@ -30,10 +34,10 @@ export default function UserForm() {
 
     const onSubmit = ev => {
         ev.preventDefault()
-        if (user.id) {
-            axiosClient.put(`/users/${user.id}`, user)
+        if (pet.id) {
+            axiosClient.put(`/pets/${pet.id}`, pet)
                 .then(() => {
-                    navigate('/users')
+                    navigate('/pets')
                 })
                 .catch(err => {
                     const response = err.response;
@@ -42,9 +46,9 @@ export default function UserForm() {
                     }
                 })
         } else {
-            axiosClient.post('/users', user)
+            axiosClient.post('/pets', pet)
                 .then(() => {
-                    navigate('/users')
+                    navigate('/pets')
                 })
                 .catch(err => {
                     const response = err.response;
@@ -57,8 +61,8 @@ export default function UserForm() {
 
     return (
         <>
-            {user.id && <h1>Update User: {user.name}</h1>}
-            {!user.id && <h1>New User</h1>}
+            {pet.id && <h1>Update Pet: {pet.name}</h1>}
+            {!pet.id && <h1>New Pet</h1>}
             <div className="card animated fadeInDown">
                 {loading && (
                     <div className="text-center">
@@ -74,12 +78,12 @@ export default function UserForm() {
                 }
                 {!loading && (
                     <form onSubmit={onSubmit}>
-                        <input value={user.name} onChange={ev => setUser({ ...user, name: ev.target.value })}
-                               placeholder="Name"/>
-                        <input value={user.email} onChange={ev => setUser({ ...user, email: ev.target.value })}
-                               placeholder="Email"/>
-                        <input type="password" onChange={ev => setUser({ ...user, password: ev.target.value })}
-                               placeholder="Password"/>
+                        <input value={pet.identifier} onChange={ev => setPet({ ...pet, identifier: ev.target.value })}
+                               placeholder="Identifier"/>
+                        <input value={pet.nickname} onChange={ev => setPet({ ...pet, nickname: ev.target.value })}
+                               placeholder="Nickname"/>
+                        <input value={pet.about} onChange={ev => setPet({ ...pet, about: ev.target.value })}
+                               placeholder="About"/>
                         <button className="btn">Save</button>
                     </form>
                 )}
