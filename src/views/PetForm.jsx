@@ -51,33 +51,35 @@ export default function PetForm() {
         }, []);
     }
 
-    const onSubmit = ev => {
-        ev.preventDefault()
-        if (pet.id) {
-            console.log(pet)
-            axiosClient.put(`/pets/${pet.id}`, pet)
-                .then(() => {
-                    navigate('/pets')
-                })
-                .catch(err => {
-                    const response = err.response;
-                    if (response && response.status === 422) {
-                        setErrors(response.data.errors)
-                    }
-                })
-        } else {
-            axiosClient.post('/pets', pet)
-                .then(() => {
-                    navigate('/pets')
-                })
-                .catch(err => {
-                    const response = err.response;
-                    if (response && response.status === 422) {
-                        setErrors(response.data.errors)
-                    }
-                })
+    const handleTypeChange = async (event) => {
+        const type_id = event.target.value;
+        setPet({...pet, type_id});
+
+        try {
+            const petResponse = await axiosClient.get(`/get_sub_types/${type_id}`);
+            setPetSubTypes(petResponse.data.data);
+        } catch (error) {
+            console.error('Ошибка при загрузке подтипов:', error);
         }
-    }
+    };
+
+    const onSubmit = async (ev) => {
+        ev.preventDefault();
+
+        try {
+            if (pet.id) {
+                await axiosClient.put(`/pets/${pet.id}`, pet);
+                navigate('/pets');
+            } else {
+                await axiosClient.post('/pets', pet);
+                navigate('/pets');
+            }
+        } catch (err) {
+            const response = err.response;
+            setErrors(response.data.errors);
+
+        }
+    };
 
     return (
         <>
@@ -123,7 +125,7 @@ export default function PetForm() {
                             <select
                                 id="pet-type"
                                 value={pet.type_id}
-                                onChange={(e) => setPet({...pet, type_id: e.target.value})}
+                                onChange={handleTypeChange}
                             >
                                 <option value="">Select pet type</option>
                                 {petTypes.map((type) => (

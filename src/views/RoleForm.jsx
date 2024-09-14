@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {useNavigate, useParams} from "react-router-dom";
 import axiosClient from "../axiosClient";
 
 export default function RoleForm() {
-    const { id } = useParams();
+    const {id} = useParams();
     const navigate = useNavigate();
     const [role, setRole] = useState({
         id: null,
@@ -17,7 +17,7 @@ export default function RoleForm() {
         useEffect(() => {
             setLoading(true)
             axiosClient.get(`/roles/${id}`)
-                .then(({ data }) => {
+                .then(({data}) => {
                     setLoading(false)
                     setRole(data.data)
                 })
@@ -27,32 +27,22 @@ export default function RoleForm() {
         }, [])
     }
 
-    const onSubmit = ev => {
-        ev.preventDefault()
-        if (role.id) {
-            axiosClient.put(`/roles/${role.id}`, role)
-                .then(() => {
-                    navigate('/roles')
-                })
-                .catch(err => {
-                    const response = err.response;
-                    if (response && response.status === 422) {
-                        setErrors(response.data.errors)
-                    }
-                })
-        } else {
-            axiosClient.post('/roles', role)
-                .then(() => {
-                    navigate('/roles')
-                })
-                .catch(err => {
-                    const response = err.response;
-                    if (response && response.status === 422) {
-                        setErrors(response.data.errors)
-                    }
-                })
+    const onSubmit = async (ev) => {
+        ev.preventDefault();
+
+        try {
+            if (role.id) {
+                await axiosClient.put(`/roles/${role.id}`, role);
+                navigate('/roles');
+            } else {
+                await axiosClient.post('/roles', role);
+                navigate('/roles');
+            }
+        } catch (err) {
+            const response = err.response;
+            setErrors(response.data.errors);
         }
-    }
+    };
 
     return (
         <>
@@ -73,9 +63,9 @@ export default function RoleForm() {
                 }
                 {!loading && (
                     <form onSubmit={onSubmit}>
-                        <input value={role.name} onChange={ev => setRole({ ...role, name: ev.target.value })}
+                        <input value={role.name} onChange={ev => setRole({...role, name: ev.target.value})}
                                placeholder="Name"/>
-                        <input value={role.slug} onChange={ev => setRole({ ...role, slug: ev.target.value })}
+                        <input value={role.slug} onChange={ev => setRole({...role, slug: ev.target.value})}
                                placeholder="Slug"/>
                         <button className="btn">Save</button>
                     </form>

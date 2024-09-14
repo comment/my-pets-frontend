@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {useNavigate, useParams} from "react-router-dom";
 import axiosClient from "../axiosClient";
 
 export default function UserForm() {
-    const { id } = useParams();
+    const {id} = useParams();
     const navigate = useNavigate();
     const [user, setUser] = useState({
         id: null,
@@ -18,7 +18,7 @@ export default function UserForm() {
         useEffect(() => {
             setLoading(true)
             axiosClient.get(`/users/${id}`)
-                .then(({ data }) => {
+                .then(({data}) => {
                     setLoading(false)
                     setUser(data.data)
                 })
@@ -28,32 +28,22 @@ export default function UserForm() {
         }, [])
     }
 
-    const onSubmit = ev => {
-        ev.preventDefault()
-        if (user.id) {
-            axiosClient.put(`/users/${user.id}`, user)
-                .then(() => {
-                    navigate('/users')
-                })
-                .catch(err => {
-                    const response = err.response;
-                    if (response && response.status === 422) {
-                        setErrors(response.data.errors)
-                    }
-                })
-        } else {
-            axiosClient.post('/users', user)
-                .then(() => {
-                    navigate('/users')
-                })
-                .catch(err => {
-                    const response = err.response;
-                    if (response && response.status === 422) {
-                        setErrors(response.data.errors)
-                    }
-                })
+    const onSubmit = async (ev) => {
+        ev.preventDefault();
+
+        try {
+            if (user.id) {
+                await axiosClient.put(`/users/${user.id}`, user);
+                navigate('/users');
+            } else {
+                await axiosClient.post('/users', user);
+                navigate('/users');
+            }
+        } catch (err) {
+            const response = err.response;
+            setErrors(response.data.errors);
         }
-    }
+    };
 
     return (
         <>
@@ -74,11 +64,11 @@ export default function UserForm() {
                 }
                 {!loading && (
                     <form onSubmit={onSubmit}>
-                        <input value={user.name} onChange={ev => setUser({ ...user, name: ev.target.value })}
+                        <input value={user.name} onChange={ev => setUser({...user, name: ev.target.value})}
                                placeholder="Name"/>
-                        <input value={user.email} onChange={ev => setUser({ ...user, email: ev.target.value })}
+                        <input value={user.email} onChange={ev => setUser({...user, email: ev.target.value})}
                                placeholder="Email"/>
-                        <input type="password" onChange={ev => setUser({ ...user, password: ev.target.value })}
+                        <input type="password" onChange={ev => setUser({...user, password: ev.target.value})}
                                placeholder="Password"/>
                         <button className="btn">Save</button>
                     </form>
