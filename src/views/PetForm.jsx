@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import axiosClient from "../axiosClient";
+import ImageUploader from "../Components/ImageUploader.jsx";
 
 export default function PetForm() {
     const {id} = useParams();
@@ -19,48 +20,57 @@ export default function PetForm() {
     const [users, setUsers] = useState([]);
     const [petTypes, setPetTypes] = useState([]);
     const [petSubTypes, setPetSubTypes] = useState([]);
+    const [uploadedImages, setUploadedImages] = useState([]);
 
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState(null);
 
-    if (id) {
-        useEffect(() => {
-            const fetchData = async () => {
-                try {
-                    setLoading(true)
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true)
+                if (id) {
                     const petResponse = await axiosClient.get(`/pets/${id}`);
                     setPet(petResponse.data.data);
 
-                    const usersResponse = await axiosClient.get('/users');
-                    setUsers(usersResponse.data.data);
-
-                    const petTypesResponse = await axiosClient.get('/pet_types');
-                    setPetTypes(petTypesResponse.data.data);
-
                     const petSubTypesResponse = await axiosClient.get('/pet_sub_types');
                     setPetSubTypes(petSubTypesResponse.data.data);
-                } catch (error) {
-                    console.error('Error fetching data:', error);
-                } finally {
-                    setLoading(false);
                 }
-            };
+                const usersResponse = await axiosClient.get('/users');
+                setUsers(usersResponse.data.data);
 
-            fetchData();
-        }, []);
-    }
+                const petTypesResponse = await axiosClient.get('/pet_types');
+                setPetTypes(petTypesResponse.data.data);
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
 
     const handleTypeChange = async (event) => {
         const type_id = event.target.value;
         setPet({...pet, type_id});
-
-        try {
-            const petResponse = await axiosClient.get(`/get_sub_types/${type_id}`);
-            setPetSubTypes(petResponse.data.data);
-        } catch (error) {
-            console.error('Ошибка при загрузке подтипов:', error);
+        if (type_id) {
+            try {
+                const petResponse = await axiosClient.get(`/get_sub_types/${type_id}`);
+                setPetSubTypes(petResponse.data.data);
+            } catch (error) {
+                console.error('Ошибка при загрузке подтипов:', error);
+            }
+        } else {
+            setPetSubTypes([]);
         }
+    };
+
+    const handleUploadComplete = (images) => {
+        setUploadedImages(images); // Сохраняем загруженные изображения
     };
 
     const onSubmit = async (ev) => {
@@ -153,6 +163,16 @@ export default function PetForm() {
                         <button className="btn">Save</button>
                     </form>
                 )}
+            </div>
+            <div>
+                <h1>Загрузка изображений</h1>
+                <ImageUploader pet_id="123" onUploadComplete={handleUploadComplete}/>
+                <h2>Загруженные изображения:</h2>
+                <ul>
+                    {uploadedImages.map((image, index) => (
+                        <li key={index}>{image.url}</li> // Предполагаем, что у каждого изображения есть поле "url"
+                    ))}
+                </ul>
             </div>
         </>
     )
