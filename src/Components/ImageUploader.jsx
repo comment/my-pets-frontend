@@ -9,6 +9,7 @@ const ImageUploader = ({ entity_id, onUploadComplete }) => {
     const handleFileChange = (event) => {
         const selectedFiles = Array.from(event.target.files);
         setFiles(selectedFiles);
+        console.log(files)
         setUploadProgress({});
     };
 
@@ -32,16 +33,15 @@ const ImageUploader = ({ entity_id, onUploadComplete }) => {
                         }));
                     }
                 });
-
-                // Передаем загруженные изображения в родительский компонент
-                onUploadComplete(response.data.images);
+                console.log(response)
+                uploadedFilesData.push(response.data.paths[0]);
             } catch (error) {
                 console.error('Ошибка при загрузке файла:', error);
             }
         }
 
         setUploading(false);
-        onUploadComplete(uploadedFilesData); // Передаем данные родительскому компоненту
+        onUploadComplete(uploadedFilesData);
     };
 
     return (

@@ -71,6 +71,7 @@ export default function PetForm() {
 
     const handleUploadComplete = (images) => {
         setUploadedImages(images); // Сохраняем загруженные изображения
+        console.log(uploadedImages)
     };
 
     const onSubmit = async (ev) => {
@@ -166,12 +167,16 @@ export default function PetForm() {
             </div>
             <div>
                 <h1>Загрузка изображений</h1>
-                <ImageUploader pet_id="123" onUploadComplete={handleUploadComplete}/>
+                <ImageUploader entity_id="123" onUploadComplete={handleUploadComplete}/>
                 <h2>Загруженные изображения:</h2>
                 <ul>
-                    {uploadedImages.map((image, index) => (
-                        <li key={index}>{image.url}</li> // Предполагаем, что у каждого изображения есть поле "url"
-                    ))}
+                    {uploadedImages && uploadedImages.length > 0 ? (
+                        uploadedImages.map((image, index) => (
+                            <li key={index}><img src={image}/></li> // Предполагаем, что у каждого изображения есть поле "url"
+                        ))
+                    ) : (
+                        <p>No pet subtypes available</p>
+                    )}
                 </ul>
             </div>
         </>
