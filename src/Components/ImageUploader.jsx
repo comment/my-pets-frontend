@@ -23,7 +23,7 @@ const ImageUploader = ({ entity_id, onUploadComplete }) => {
             formData.append('image', file);
             console.log(file)
             try {
-                const response = await axiosClient.post('/upload-images', formData, {
+                const response = await axiosClient.post('/images', formData, {
                     onUploadProgress: (progressEvent) => {
                         const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
                         // Обновляем состояние прогресса
