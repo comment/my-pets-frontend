@@ -1,72 +1,78 @@
-import React, { useState } from 'react';
-import axiosClient from "../axiosClient.js";
+import React, { useState, useEffect } from 'react';
+import axiosClient from '../axiosClient';
+import ImageItem from './ImageItem';
 
-const ImageUploader = ({ entity_id, onUploadComplete }) => {
-    const [files, setFiles] = useState([]);
-    const [uploading, setUploading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState({});
+const ImageUploader = ({ existingImages = [] }) => {
+    const [uploadedImages, setUploadedImages] = useState(existingImages);
+    const [fileInput, setFileInput] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState(null);
 
-    const handleFileChange = (event) => {
-        const selectedFiles = Array.from(event.target.files);
-        setFiles(selectedFiles);
-        console.log(files)
-        setUploadProgress({});
+    useEffect(() => {
+        setUploadedImages(existingImages); // Обновляем список при изменении существующих изображений
+    }, [existingImages]);
+
+    const handleFileChange = (e) => {
+        setFileInput(e.target.files);
     };
 
-    const uploadFiles = async () => {
-        setUploading(true);
-        const uploadedFilesData = [];
+    const uploadImage = async () => {
+        if (!fileInput) return; // Если файлы не выбраны, ничего не делаем
+        setLoading(true);
 
-        for (const file of files) {
-            const formData = new FormData();
-            formData.append('entity_id', entity_id);
+        const formData = new FormData();
+        // Добавляем все выбранные файлы в FormData
+        for (const file of Array.from(fileInput)) {
             formData.append('image', file);
-            console.log(file)
+            console.log('gogogo')
             try {
-                const response = await axiosClient.post('/images', formData, {
-                    onUploadProgress: (progressEvent) => {
-                        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                        // Обновляем состояние прогресса
-                        setUploadProgress(prevProgress => ({
-                            ...prevProgress,
-                            [files[0].name]: percentCompleted // Предполагаем, что мы показываем прогресс только для первого файла
-                        }));
-                    }
-                });
+                const response = await axiosClient.post('/images', formData); // API для загрузки изображений
                 console.log(response)
-                uploadedFilesData.push(response.data.paths[0]);
+                setUploadedImages([...uploadedImages, response.data.data.paths]); // Добавляем загруженное изображение в список
+                setFileInput(null); // Очищаем файловый ввод после загрузки
             } catch (error) {
-                console.error('Ошибка при загрузке файла:', error);
+                setErrors(error.response ? error.response.data : "Ошибка загрузки изображения");
+            } finally {
+                setLoading(false);
             }
+
         }
 
-        setUploading(false);
-        onUploadComplete(uploadedFilesData);
+    };
+
+    const deleteImage = async (imageId) => {
+        setLoading(true);
+        try {
+            await axiosClient.delete(`/images/${imageId}`); // API для удаления изображений
+            setUploadedImages(uploadedImages.filter(image => image.id !== imageId)); // Удаляем изображение из списка
+        } catch (error) {
+            setErrors(error.response ? error.response.data : "Ошибка удаления изображения");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div>
-            <input type="file" multiple onChange={handleFileChange} />
-            <button onClick={uploadFiles} disabled={uploading || files.length === 0}>
-                Загрузить изображения
+            <h2>Выбор изображений</h2>
+            <input
+                type="file"
+                multiple
+                onChange={handleFileChange}
+            />
+            <button onClick={uploadImage} disabled={!fileInput || loading}>
+                {loading ? 'Загрузка...' : 'Загрузить изображение'}
             </button>
-
-            {files.map((file) => (
-                <div key={file.name}>
-                    <p>{file.name}</p>
-                    {uploading && uploadProgress[file.name] !== undefined && (
-                        <div style={{ width: '100%', backgroundColor: '#f3f3f3' }}>
-                            <div
-                                style={{
-                                    width: `${uploadProgress[file.name]}%`,
-                                    height: '10px',
-                                    backgroundColor: '#4caf50'
-                                }}
-                            />
-                        </div>
-                    )}
-                </div>
-            ))}
+            {errors && <div className="error">{errors}</div>}
+            <div className="image-list">
+                {uploadedImages.map(image => (
+                    <ImageItem
+                        key={image.id}
+                        image={image}
+                        onDelete={() => deleteImage(image.id)}
+                    />
+                ))}
+            </div>
         </div>
     );
 };

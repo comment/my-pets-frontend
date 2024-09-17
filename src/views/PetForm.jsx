@@ -20,7 +20,7 @@ export default function PetForm() {
     const [users, setUsers] = useState([]);
     const [petTypes, setPetTypes] = useState([]);
     const [petSubTypes, setPetSubTypes] = useState([]);
-    const [uploadedImages, setUploadedImages] = useState([]);
+    const existingImages = [];
 
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState(null);
@@ -69,11 +69,6 @@ export default function PetForm() {
         }
     };
 
-    const handleUploadComplete = (images) => {
-        setUploadedImages(images); // Сохраняем загруженные изображения
-        console.log(uploadedImages)
-    };
-
     const onSubmit = async (ev) => {
         ev.preventDefault();
 
@@ -88,7 +83,6 @@ export default function PetForm() {
         } catch (err) {
             const response = err.response;
             setErrors(response.data.errors);
-
         }
     };
 
@@ -166,18 +160,10 @@ export default function PetForm() {
                 )}
             </div>
             <div>
-                <h1>Загрузка изображений</h1>
-                <ImageUploader entity_id="123" onUploadComplete={handleUploadComplete}/>
-                <h2>Загруженные изображения:</h2>
-                <ul>
-                    {uploadedImages && uploadedImages.length > 0 ? (
-                        uploadedImages.map((image, index) => (
-                            <li key={index}><img src={image}/></li> // Предполагаем, что у каждого изображения есть поле "url"
-                        ))
-                    ) : (
-                        <p>No pet subtypes available</p>
-                    )}
-                </ul>
+                <div>
+                    <h1>Форма питомца</h1>
+                    <ImageUploader existingImages={existingImages} />
+                </div>
             </div>
         </>
     )
