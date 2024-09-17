@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import axiosClient from '../axiosClient';
 import ImageItem from './ImageItem';
 
-const ImageUploader = ({ existingImages = [] }) => {
+const ImageUploader = ({existingImages = []}) => {
     const [uploadedImages, setUploadedImages] = useState(existingImages);
     const [fileInput, setFileInput] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -17,26 +17,28 @@ const ImageUploader = ({ existingImages = [] }) => {
     };
 
     const uploadImage = async () => {
+        console.log(uploadedImages)
         if (!fileInput) return; // Если файлы не выбраны, ничего не делаем
         setLoading(true);
 
-        const formData = new FormData();
-        // Добавляем все выбранные файлы в FormData
-        for (const file of Array.from(fileInput)) {
-            formData.append('image', file);
-            console.log('gogogo')
-            try {
-                const response = await axiosClient.post('/images', formData); // API для загрузки изображений
-                console.log(response)
-                setUploadedImages([...uploadedImages, response.data.data.paths]); // Добавляем загруженное изображение в список
-                setFileInput(null); // Очищаем файловый ввод после загрузки
-            } catch (error) {
-                setErrors(error.response ? error.response.data : "Ошибка загрузки изображения");
-            } finally {
-                setLoading(false);
-            }
+        try {
+            // Добавляем все выбранные файлы в FormData
+            for (const file of Array.from(fileInput)) {
 
+                const formData = new FormData();
+                formData.append('image', file);
+                console.log(file)
+                const response = await axiosClient.post('/images', formData); // API для загрузки изображений
+                setUploadedImages([...uploadedImages, response.data.image]); // Добавляем загруженное изображение в список
+                console.log(uploadedImages)
+            }
+            setFileInput(null); // Очищаем файловый ввод после загрузки
+        } catch (error) {
+            setErrors(error.response ? error.response.data : "Ошибка загрузки изображения");
+        } finally {
+            setLoading(false);
         }
+
 
     };
 
