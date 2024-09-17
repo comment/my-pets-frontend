@@ -13,8 +13,8 @@ export default function PetForm() {
         date_of_birth: '',
         about: '',
         user_id: '',
-        type_id: '',
-        sub_type_id: '',
+        pet_type_id: '',
+        pet_sub_type_id: '',
     });
 
     const [users, setUsers] = useState([]);
@@ -55,11 +55,11 @@ export default function PetForm() {
 
 
     const handleTypeChange = async (event) => {
-        const type_id = event.target.value;
-        setPet({...pet, type_id});
-        if (type_id) {
+        const pet_type_id = event.target.value;
+        setPet({...pet, pet_type_id});
+        if (pet_type_id) {
             try {
-                const petResponse = await axiosClient.get(`/get_sub_types/${type_id}`);
+                const petResponse = await axiosClient.get(`/get_sub_types/${pet_type_id}`);
                 setPetSubTypes(petResponse.data.data);
             } catch (error) {
                 console.error('Ошибка при загрузке подтипов:', error);
@@ -135,7 +135,7 @@ export default function PetForm() {
                         <div>
                             <select
                                 id="pet-type"
-                                value={pet.type_id}
+                                value={pet.pet_type_id}
                                 onChange={handleTypeChange}
                             >
                                 <option value="">Select pet type</option>
@@ -150,8 +150,8 @@ export default function PetForm() {
                         <div>
                             <select
                                 id="pet-sub-type"
-                                value={pet.sub_type_id}
-                                onChange={(e) => setPet({...pet, sub_type_id: e.target.value})}
+                                value={pet.pet_sub_type_id}
+                                onChange={(e) => setPet({...pet, pet_sub_type_id: e.target.value})}
                             >
                                 <option value="">Select pet sub type</option>
                                 {petSubTypes.map((subType) => (
