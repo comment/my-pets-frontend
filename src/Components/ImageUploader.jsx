@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axiosClient from '../axiosClient';
 import ImageItem from './ImageItem';
 
@@ -7,6 +7,15 @@ const ImageUploader = ({existingImages = []}) => {
     const [fileInput, setFileInput] = useState(null);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState(null);
+    const fl = useRef(true);
+
+    useEffect(() => {
+        console.log('Component mount');
+        return () => {
+            console.log('Component unmount');
+            fl.current = false;
+        };
+    },[]);
 
     useEffect(() => {
         setUploadedImages(existingImages); // Обновляем список при изменении существующих изображений
@@ -17,20 +26,20 @@ const ImageUploader = ({existingImages = []}) => {
     };
 
     const uploadImage = async () => {
-        console.log(uploadedImages)
         if (!fileInput) return; // Если файлы не выбраны, ничего не делаем
         setLoading(true);
 
         try {
             // Добавляем все выбранные файлы в FormData
             for (const file of Array.from(fileInput)) {
-
+                if (!fl.current) {
+                    return;
+                }
                 const formData = new FormData();
                 formData.append('image', file);
-                console.log(file)
-                const response = await axiosClient.post('/images', formData); // API для загрузки изображений
-                setUploadedImages([...uploadedImages, response.data.image]); // Добавляем загруженное изображение в список
-                console.log(uploadedImages)
+                const response = await axiosClient.post('/images', formData);// API для загрузки изображений
+                console.log('File loaded');
+                setUploadedImages((prevImages) => [...prevImages, response.data.image]); // Добавляем загруженное изображение в список
             }
             setFileInput(null); // Очищаем файловый ввод после загрузки
         } catch (error) {

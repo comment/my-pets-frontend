@@ -85,7 +85,7 @@ export default function PetForm() {
             setErrors(response.data.errors);
         }
     };
-
+    const [watch, setWatch] = useState(true);
     return (
         <>
             {pet.id && <h1>Update Pet: {pet.name}</h1>}
@@ -162,7 +162,9 @@ export default function PetForm() {
             <div>
                 <div>
                     <h1>Форма питомца</h1>
-                    <ImageUploader existingImages={existingImages} />
+                    <button onClick={() => { setWatch(true) }}>Показать</button>
+                    <button onClick={() => { setWatch(false) }}>Скрыть</button>
+                    { watch && <ImageUploader existingImages={existingImages} />}
                 </div>
             </div>
         </>
