@@ -9,6 +9,8 @@ import Pets from "./views/pets";
 import PetForm from "./views/PetForm.jsx";
 import Roles from "./views/roles";
 import RoleForm from "./views/RoleForm";
+import PetProfile from "./views/PetProfile.jsx";
+import PetProfileNew from "./views/PetProfileNew";
 
 const router = createBrowserRouter([
     {
@@ -50,6 +52,10 @@ const router = createBrowserRouter([
             {
                 path: "roles/:id",
                 element: <RoleForm key="RoleUpdate" />,
+            },
+            {
+                path: "my_pets",
+                element: <PetProfileNew key="PetProfile" />,
             }
         ]
     },
